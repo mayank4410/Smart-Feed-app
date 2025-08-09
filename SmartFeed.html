@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartFeed App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 22px;
+      color: #333;
+    }
+
+    .category-bar {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 0;
+      scrollbar-width: none;
+    }
+
+    .category-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category {
+      flex: none;
+      padding: 8px 16px;
+      background-color: #ddd;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .category.active {
+      background-color: #000;
+      color: #fff;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>SmartFeed</h2>
+    <div class="category-bar" id="categoryBar">
+      <div class="category active" data-category="nature">Nature</div>
+      <div class="category" data-category="mountains">Mountains</div>
+      <div class="category" data-category="business">Business</div>
+      <div class="category" data-category="girl">Girls</div>
+      <div class="category" data-category="boy">Boys</div>
+      <div class="category" data-category="children">Children</div>
+    </div>
+  </header>
+
+  <div class="gallery" id="gallery">
+    <!-- Images will be loaded here -->
+  </div>
+
+  <script>
+    const gallery = document.getElementById("gallery");
+    const categories = document.querySelectorAll(".category");
+    let currentCategory = "nature";
+    let imageCount = 0;
+    let loading = false;
+
+    // Load 10 images at a time
+    function loadImages(count = 10) {
+      if (loading) return;
+      loading = true;
+      for (let i = 0; i < count; i++) {
+        const img = document.createElement("img");
+        const url = `https://picsum.photos/400/300?random=${Date.now() + Math.random()}&category=${currentCategory}`;
+        img.src = url;
+        img.alt = currentCategory;
+        gallery.appendChild(img);
+      }
+      imageCount += count;
+      loading = false;
+    }
+
+    // Set active category
+    categories.forEach(cat => {
+      cat.addEventListener("click", () => {
+        categories.forEach(c => c.classList.remove("active"));
+        cat.classList.add("active");
+        currentCategory = cat.getAttribute("data-category");
+        gallery.innerHTML = "";
+        imageCount = 0;
+        loadImages(12); // Load initial images for new category
+      });
+    });
+
+    // Infinite scroll
+    window.addEventListener("scroll", () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+        loadImages(6); // Load more images
+      }
+    });
+
+    // Load default images
+    loadImages(12);
+  </script>
+
+</body>
+</html>
